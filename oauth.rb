@@ -96,13 +96,13 @@ class OAuth
     uri = URI.parse(request_url)
     uri.query = normalized_params if method.to_s.upcase == 'GET'
 
-    https = Net::HTTP.new(uri.host, uri.port)
-    https.use_ssl = true
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true if uri.port == 443
 
-    req = Net::HTTP::const_get(request_method.capitalize.to_sym).new(uri.path)
+    req = Net::HTTP.const_get(request_method.capitalize.to_sym).new(uri.path)
     req['Authorization'] = authorization_header if method.to_s.upcase == 'POST'
 
-    res = https.request(req)
+    res = http.request(req)
     res.body
   end
 end
