@@ -24,8 +24,6 @@ class OAuth
                 :token_secret
 
   def initialize(opts = {})
-    consumer_key = nil
-    consumer_secret = nil
     yield self if block_given?
 
     self.consumer_key    ||= opts[:consumer_key]
