@@ -48,9 +48,9 @@ class OAuth
 
   def signed_params
     signature =
-      [OpenSSL::HMAC.digest('sha1', signature_key, signature_base)].pack('m').chomp.gsub(/\n/, '')
+      [OpenSSL::HMAC.digest('sha1', signature_key, signature_base)].pack('m').chomp.delete(/\n/)
 
-    params.merge({oauth_signature: signature})
+    params.merge(oauth_signature: signature)
   end
 
   def normalized_header_params
@@ -78,12 +78,8 @@ class OAuth
 
   def signature_key
     key = escape(consumer_secret) + '&'
-    key += escape(token_secret) if has_token?
+    key += escape(token_secret) if !token.nil? && !token_secret.nil?
     key
-  end
-
-  def has_token?
-    !token.nil? && !token_secret.nil?
   end
 
   def escape(string)
