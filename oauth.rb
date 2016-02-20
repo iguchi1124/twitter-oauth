@@ -26,8 +26,8 @@ class OAuth
   def initialize(opts = {})
     yield self if block_given?
 
-    self.consumer_key    ||= opts[:consumer_key]
-    self.consumer_secret ||= opts[:consumer_secret]
+    self.consumer_key    ||= opts['consumer_key']
+    self.consumer_secret ||= opts['consumer_secret']
 
     self.signature_method ||= 'HMAC-SHA1'
     self.timestamp        ||= Time.now.to_i.to_s
@@ -48,7 +48,7 @@ class OAuth
 
   def signed_params
     signature =
-      [OpenSSL::HMAC.digest('sha1', signature_key, signature_base)].pack('m').chomp.delete(/\n/)
+      [OpenSSL::HMAC.digest('sha1', signature_key, signature_base)].pack('m').chomp.gsub(/\n/, '')
 
     params.merge(oauth_signature: signature)
   end
@@ -106,3 +106,8 @@ class OAuth
     res.body
   end
 end
+
+require 'yaml'
+client = OAuth.new(YAML.load_file('secrets.yml'))
+
+puts client.get_request_token('post', 'https://api.twitter.com/oauth/request_token')
