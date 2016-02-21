@@ -47,22 +47,36 @@ class OAuth
   end
 
   def signed_params
-    signature =
-      [OpenSSL::HMAC.digest('sha1', signature_key, signature_base)].pack('m').chomp.gsub(/\n/, '')
-
+    signature = base64_encode(OpenSSL::HMAC.digest('sha1', signature_key, signature_base))
     params.merge(oauth_signature: signature)
-  end
-
-  def normalized_header_params
-    signed_params.sort_by { |k, _v| k.to_s }.collect { |k, v| %(#{k}="#{escape v}") }.join(', ')
   end
 
   def normalized_params
     params.sort_by { |k, _v| k.to_s }.collect { |k, v| "#{k}=#{v}" }.join('&')
   end
 
+  def normalized_signed_params
+    signed_params
+      .sort_by { |k, _v| k.to_s }
+      .collect { |k, v| "#{k}=#{percent_encode(v)}" }
+      .join('&')
+  end
+
+  def normalized_header_params
+    signed_params
+      .sort_by { |k, _v| k.to_s }
+      .collect { |k, v| %(#{k}="#{percent_encode(v)}") }
+      .join(', ')
+  end
+
   def authorization_header
-    "OAurh #{normalized_header_params}"
+    "OAuth #{normalized_header_params}"
+  end
+
+  def signature_key
+    key = percent_encode(consumer_secret) + '&'
+    key += percent_encode(token_secret) if !token.nil? && !token_secret.nil?
+    key
   end
 
   def base_string_uri
@@ -73,34 +87,36 @@ class OAuth
   end
 
   def signature_base
-    escape "#{request_method.upcase}&#{base_string_uri}&#{normalized_params}"
+    [
+      "#{percent_encode(request_method.upcase)}",
+      "#{percent_encode(base_string_uri)}",
+      "#{percent_encode(normalized_params)}"
+    ].join('&')
   end
 
-  def signature_key
-    key = escape(consumer_secret) + '&'
-    key += escape(token_secret) if !token.nil? && !token_secret.nil?
-    key
-  end
-
-  def escape(string)
+  def percent_encode(string)
     encoding = string.encoding
     string.b.gsub(/([^ a-zA-Z0-9_.-]+)/) do |m|
       '%' + m.unpack('H2' * m.bytesize).join('%').upcase
     end.tr(' ', '+').force_encoding(encoding)
   end
 
+  def base64_encode(string)
+    [string].pack('m').chomp.gsub(/\n/, '')
+  end
+
   def get_request_token(method, url)
     self.request_url = url
-    self.request_method = method
+    self.request_method = method.to_s
 
-    uri = URI.parse(request_url)
-    uri.query = normalized_params if method.to_s.upcase == 'GET'
+    uri = URI(request_url)
+    uri.query = normalized_signed_params if request_method.upcase == 'GET'
 
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true if uri.port == 443
 
-    req = Net::HTTP.const_get(request_method.capitalize.to_sym).new(uri.path)
-    req['Authorization'] = authorization_header if method.to_s.upcase == 'POST'
+    req = Net::HTTP.const_get(request_method.capitalize.to_sym).new(uri)
+    req['Authorization'] = authorization_header if request_method.upcase == 'POST'
 
     res = http.request(req)
     res.body
@@ -110,4 +126,4 @@ end
 require 'yaml'
 client = OAuth.new(YAML.load_file('secrets.yml'))
 
-puts client.get_request_token('post', 'https://api.twitter.com/oauth/request_token')
+puts client.get_request_token(:post, 'https://api.twitter.com/oauth/request_token')
