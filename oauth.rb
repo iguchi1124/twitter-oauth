@@ -10,7 +10,6 @@ require 'bundler'
 Bundler.require
 
 class OAuth
-
   # Example:
   #
   # require 'yaml'
@@ -73,7 +72,7 @@ class OAuth
   def normalized_header_params
     signed_params
       .sort_by { |k, _v| k.to_s }
-      .collect { |k, v| %(#{k}="#{percent_encode(v)}") }
+      .collect { |k, v| %{#{k}="#{percent_encode(v)}"} }
       .join(', ')
   end
 
@@ -96,9 +95,9 @@ class OAuth
 
   def signature_base
     [
-      "#{percent_encode(request_method.upcase)}",
-      "#{percent_encode(base_string_uri)}",
-      "#{percent_encode(normalized_params)}"
+      percent_encode(request_method.upcase),
+      percent_encode(base_string_uri),
+      percent_encode(normalized_params)
     ].join('&')
   end
 
@@ -110,7 +109,7 @@ class OAuth
   end
 
   def base64_encode(string)
-    [string].pack('m').chomp.gsub(/\n/, '')
+    [string].pack('m').chomp.delete "\n"
   end
 
   def get_request_token(method, url)
@@ -118,13 +117,13 @@ class OAuth
     self.request_method = method.to_s
 
     uri = URI(request_url)
-    uri.query = normalized_signed_params if request_method.upcase == 'GET'
+    uri.query = normalized_signed_params if request_method.casecmp('GET') == 0
 
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true if uri.port == 443
 
     req = Net::HTTP.const_get(request_method.capitalize.to_sym).new(uri)
-    req['Authorization'] = authorization_header if request_method.upcase == 'POST'
+    req['Authorization'] = authorization_header if request_method.casecmp('POST') == 0
 
     res = http.request(req)
     res.body
