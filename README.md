@@ -1,9 +1,7 @@
-# Twitter Oauth
+# Twitter Oauth Client
 
-Implement Twitter PIN-based authorization in Ruby.
+Implement twitter OAuth client for Ruby.
 
 ## References
 
 - [OAuth | Twitter Developers](https://dev.twitter.com/oauth)
-
-- [PIN-based authorization | Twitter Developers](https://dev.twitter.com/oauth/pin-based)
