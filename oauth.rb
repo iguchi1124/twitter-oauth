@@ -10,6 +10,14 @@ require 'bundler'
 Bundler.require
 
 class OAuth
+
+  # Example:
+  #
+  # require 'yaml'
+  # client = OAuth.new(YAML.load_file('secrets.yml'))
+  # client.get_request_token(:post, 'https://api.twitter.com/oauth/request_token')
+  #
+
   VERSION = '1.0'
 
   attr_accessor :callback,
@@ -122,8 +130,3 @@ class OAuth
     res.body
   end
 end
-
-require 'yaml'
-client = OAuth.new(YAML.load_file('secrets.yml'))
-
-puts client.get_request_token(:post, 'https://api.twitter.com/oauth/request_token')
