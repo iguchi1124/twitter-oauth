@@ -39,7 +39,7 @@ class OAuth
     self.signature_method ||= 'HMAC-SHA1'
     self.timestamp        ||= Time.now.to_i.to_s
     self.nonce            ||= OpenSSL::Random.random_bytes(16).unpack('H*')[0]
-    self.callback         ||= 'oob'
+    self.callback         ||= opts['callback'] || 'oob'
   end
 
   def params
@@ -87,7 +87,7 @@ class OAuth
   end
 
   def base_string_uri
-    uri = URI.parse(request_url)
+    uri = URI(request_url)
     host = uri.host
     host += ":#{uri.port}" unless uri.port == 80 || uri.port == 443
     uri.scheme + '://' + host + uri.path
