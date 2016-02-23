@@ -95,7 +95,7 @@ class OAuth
 
   def signature_base
     [
-      percent_encode(request_method.upcase),
+      percent_encode(request_method.upcase.to_s),
       percent_encode(base_string_uri),
       percent_encode(normalized_params)
     ].join('&')
@@ -112,18 +112,32 @@ class OAuth
     [string].pack('m').chomp.delete "\n"
   end
 
-  def get_request_token(method, url)
+  def get(url)
     self.request_url = url
-    self.request_method = method.to_s
+    self.request_method = :get
 
     uri = URI(request_url)
-    uri.query = normalized_signed_params if request_method.casecmp('GET') == 0
+    uri.query = normalized_signed_params
 
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true if uri.port == 443
 
-    req = Net::HTTP.const_get(request_method.capitalize.to_sym).new(uri)
-    req['Authorization'] = authorization_header if request_method.casecmp('POST') == 0
+    req = Net::HTTP::Get.new(uri)
+
+    res = http.request(req)
+    res.body
+  end
+
+  def post(url)
+    self.request_url = url
+    self.request_method = :post
+
+    uri = URI(request_url)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true if uri.port == 443
+
+    req = Net::HTTP::Post.new(uri)
+    req['Authorization'] = authorization_header
 
     res = http.request(req)
     res.body
