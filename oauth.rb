@@ -142,4 +142,18 @@ class OAuth
     res = http.request(req)
     res.body
   end
+
+  def set_token(request_token_url, method = :post)
+    return true if !token.nil? && !token_secret.nil?
+
+    res = send(method, request_token_url)
+
+    opts = {}
+    res.split('&').map { |str| str.split('=') }.each { |k, v| opts.merge! k => v }
+
+    self.token = opts['oauth_token']
+    self.token_secret = opts['oauth_token_secret']
+
+    !token.nil? && !token_secret.nil?
+  end
 end
