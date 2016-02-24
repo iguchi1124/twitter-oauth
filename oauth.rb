@@ -149,7 +149,7 @@ class OAuth
     res = send(method, request_token_url)
 
     opts = {}
-    res.split('&').map { |str| str.split('=') }.each { |k, v| opts.merge! k => v }
+    res.split('&').map { |str| str.split('=') }.each { |k, v| opts[k] = v }
 
     self.token = opts['oauth_token']
     self.token_secret = opts['oauth_token_secret']
