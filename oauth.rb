@@ -28,7 +28,9 @@ class OAuth
                 :signature_method,
                 :timestamp,
                 :token,
-                :token_secret
+                :token_secret,
+                :pin,
+                :screen_name
 
   def initialize(opts = {})
     yield self if block_given?
@@ -43,7 +45,7 @@ class OAuth
   end
 
   def params
-    {
+    hash = {
       oauth_nonce: nonce,
       oauth_consumer_key: consumer_key,
       oauth_signature_method: signature_method,
@@ -51,6 +53,13 @@ class OAuth
       oauth_callback: callback,
       oauth_version: VERSION
     }
+
+    if has_request_token?
+      hash[:oauth_token] = token
+      hash[:oauth_verifier] = pin
+    end
+
+    hash
   end
 
   def signed_params
@@ -82,7 +91,7 @@ class OAuth
 
   def signature_key
     key = percent_encode(consumer_secret) + '&'
-    key += percent_encode(token_secret) if !token.nil? && !token_secret.nil?
+    key += percent_encode(token_secret) if has_request_token?
     key
   end
 
@@ -99,6 +108,10 @@ class OAuth
       percent_encode(base_string_uri),
       percent_encode(normalized_params)
     ].join('&')
+  end
+
+  def has_request_token?
+    !token.nil? && !token_secret.nil?
   end
 
   def percent_encode(string)
@@ -143,8 +156,8 @@ class OAuth
     res.body
   end
 
-  def set_token(request_token_url, method = :post)
-    return true if !token.nil? && !token_secret.nil?
+  def get_request_token(request_token_url, method = :post)
+    return if has_request_token?
 
     res = send(method, request_token_url)
 
@@ -154,6 +167,20 @@ class OAuth
     self.token = opts['oauth_token']
     self.token_secret = opts['oauth_token_secret']
 
-    !token.nil? && !token_secret.nil?
+    opts
+  end
+
+  def get_access_token(access_token_url, method = :post)
+    return unless has_request_token?
+
+    res = send(method, access_token_url)
+
+    opts = {}
+    res.split('&').map { |str| str.split('=') }.each { |k, v| opts[k] = v }
+
+    self.token = opts['oauth_token']
+    self.token_secret = opts['oauth_token_secret']
+
+    opts
   end
 end
