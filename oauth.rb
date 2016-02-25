@@ -29,8 +29,7 @@ class OAuth
                 :timestamp,
                 :token,
                 :token_secret,
-                :pin,
-                :screen_name
+                :pin
 
   def initialize(opts = {})
     yield self if block_given?
