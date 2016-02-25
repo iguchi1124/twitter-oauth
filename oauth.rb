@@ -56,12 +56,7 @@ class OAuth
 
     if has_request_token?
       hash[:oauth_token] = token
-
-      if callback == 'oob'
-        hash[:oauth_verifier] = pin
-      else
-        hash[:oauth_verifier] = callback
-      end
+      hash[:oauth_verifier] = callback == 'oob' ? pin : callback
     end
 
     hash
