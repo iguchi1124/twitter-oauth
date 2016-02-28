@@ -1,4 +1,3 @@
-require_relative '../lib/oauth/encoder'
 require_relative '../lib/oauth/header'
 require_relative '../lib/oauth/client'
 require 'yaml'

@@ -12,7 +12,6 @@ Bundler.require
 module OAuth
   class Client
     include OAuth::Header
-    include OAuth::Encoder
 
     def initialize(opts = {})
       yield self if block_given?
