@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module OAuth
   module Header
     VERSION = 1.0
@@ -24,7 +26,7 @@ module OAuth
         oauth_version: VERSION
       }
 
-      if has_request_token?
+      if request_token?
         hash[:oauth_token] = token
         hash[:oauth_verifier] = callback == 'oob' ? pin : callback
       end
@@ -61,7 +63,7 @@ module OAuth
 
     def signature_key
       key = percent_encode(consumer_secret) + '&'
-      key += percent_encode(token_secret) if has_request_token?
+      key += percent_encode(token_secret) if request_token?
       key
     end
 
@@ -80,7 +82,7 @@ module OAuth
       ].join('&')
     end
 
-    def has_request_token?
+    def request_token?
       !token.nil? && !token_secret.nil?
     end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../lib/oauth/header'
 require_relative '../lib/oauth/client'
 require 'yaml'
