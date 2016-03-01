@@ -5,10 +5,6 @@ require 'net/http'
 require 'openssl'
 require 'uri'
 
-# RubyGems
-require 'bundler'
-Bundler.require
-
 module OAuth
   class Client
     include OAuth::Header

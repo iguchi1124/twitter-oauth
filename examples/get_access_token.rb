@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# RubyGems
+require 'bundler'
+Bundler.require
+
 require_relative '../lib/oauth/header'
 require_relative '../lib/oauth/client'
 require 'yaml'
