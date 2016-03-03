@@ -50,14 +50,13 @@ module OAuth
         .join('&')
     end
 
-    def normalized_header_params
-      signed_params
-        .sort_by { |k, _v| k.to_s }
-        .collect { |k, v| %{#{k}="#{percent_encode(v)}"} }
-        .join(', ')
-    end
-
     def authorization_header
+      normalized_header_params =
+        signed_params
+          .sort_by { |k, _v| k.to_s }
+          .collect { |k, v| %{#{k}="#{percent_encode(v)}"} }
+          .join(', ')
+
       "OAuth #{normalized_header_params}"
     end
 
@@ -86,16 +85,16 @@ module OAuth
       !token.nil? && !token_secret.nil?
     end
 
-    def percent_encode(base_string)
-      string = base_string.to_s
+    def percent_encode(str)
+      string = str.to_s
       encoding = string.encoding
       string.b.gsub(/([^ a-zA-Z0-9_.-]+)/) do |m|
         '%' + m.unpack('H2' * m.bytesize).join('%').upcase
       end.tr(' ', '+').force_encoding(encoding)
     end
 
-    def base64_encode(string)
-      [string].pack('m').chomp.delete "\n"
+    def base64_encode(str)
+      [str].pack('m').chomp.delete "\n"
     end
   end
 end
