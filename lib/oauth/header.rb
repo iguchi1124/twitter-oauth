@@ -15,7 +15,7 @@ module OAuth
                   :pin
 
     def params
-      hash = {
+      params = {
         oauth_nonce: nonce,
         oauth_consumer_key: consumer_key,
         oauth_signature_method: signature_method,
@@ -24,12 +24,13 @@ module OAuth
         oauth_version: VERSION
       }
 
+      # FIXME
       if request_token?
-        hash[:oauth_token] = token
-        hash[:oauth_verifier] = callback == 'oob' ? pin : callback
+        params[:oauth_token] = token
+        params[:oauth_verifier] = callback == 'oob' ? pin : callback
       end
 
-      hash
+      params
     end
 
     def signed_params
@@ -37,6 +38,7 @@ module OAuth
       params.merge(oauth_signature: signature)
     end
 
+    # FIXME
     def normalized_params
       params.sort_by { |k, _v| k.to_s }.collect { |k, v| "#{k}=#{v}" }.join('&')
     end
