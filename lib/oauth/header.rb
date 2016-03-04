@@ -52,10 +52,9 @@ module OAuth
 
     def authorization_header
       normalized_header_params =
-        signed_params
-          .sort_by { |k, _v| k.to_s }
-          .collect { |k, v| %{#{k}="#{percent_encode(v)}"} }
-          .join(', ')
+        signed_params.sort_by { |k, _v| k.to_s }
+                     .collect { |k, v| %{#{k}="#{percent_encode(v)}"} }
+                     .join(', ')
 
       "OAuth #{normalized_header_params}"
     end

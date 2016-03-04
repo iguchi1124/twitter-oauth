@@ -43,9 +43,8 @@ module OAuth
 
       uri = URI(@request_url)
 
-      if !opts.nil?
-        uri.query = opts.collect {|k, v| "#{k}=#{v}" }.join('&')
-      end
+      
+      uri.query = opts.collect { |k, v| "#{k}=#{v}" }.join('&') unless opts.nil?
 
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true if uri.port == 443
