@@ -8,8 +8,6 @@ module OAuth
                   :consumer_key,
                   :consumer_secret,
                   :nonce,
-                  :request_method,
-                  :request_url,
                   :signature_method,
                   :timestamp,
                   :token,
@@ -67,7 +65,7 @@ module OAuth
     end
 
     def base_string_uri
-      uri = URI(request_url)
+      uri = URI(@request_url)
       host = uri.host
       host += ":#{uri.port}" unless uri.port == 80 || uri.port == 443
       uri.scheme + '://' + host + uri.path
@@ -75,7 +73,7 @@ module OAuth
 
     def signature_base
       [
-        percent_encode(request_method.upcase.to_s),
+        percent_encode(@request_method.upcase.to_s),
         percent_encode(base_string_uri),
         percent_encode(normalized_params)
       ].join('&')

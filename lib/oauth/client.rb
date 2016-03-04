@@ -22,8 +22,8 @@ module OAuth
     end
 
     def get(url)
-      self.request_url = url
-      self.request_method = :get
+      @request_url = url
+      @request_method = :get
 
       uri = URI(request_url)
       uri.query = normalized_signed_params
@@ -37,11 +37,16 @@ module OAuth
       res.body
     end
 
-    def post(url)
-      self.request_url = url
-      self.request_method = :post
+    def post(url, opts = {})
+      @request_url = url
+      @request_method = :post
 
-      uri = URI(request_url)
+      uri = URI(@request_url)
+
+      if !opts.nil?
+        uri.query = opts.collect {|k, v| "#{k}=#{v}" }.join('&')
+      end
+
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true if uri.port == 443
 
