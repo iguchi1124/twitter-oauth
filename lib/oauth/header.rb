@@ -4,15 +4,17 @@ module OAuth
   module Header
     VERSION = 1.0
 
-    attr_accessor :callback,
+    attr_accessor :access_token,
+                  :access_token_secret,
+                  :callback,
                   :consumer_key,
                   :consumer_secret,
                   :nonce,
+                  :pin,
                   :signature_method,
                   :timestamp,
                   :token,
-                  :token_secret,
-                  :pin
+                  :token_secret
 
     def params
       params = {
@@ -24,8 +26,9 @@ module OAuth
         oauth_version: VERSION
       }
 
-      # FIXME
-      if request_token?
+      if access_token?
+        params[:oauth_token] = access_token
+      elsif request_token?
         params[:oauth_token] = token
         params[:oauth_verifier] = callback == 'oob' ? pin : callback
       end
@@ -38,9 +41,9 @@ module OAuth
       params.merge(oauth_signature: signature)
     end
 
-    # FIXME
     def normalized_params
-      params.sort_by { |k, _v| k.to_s }.collect { |k, v| "#{k}=#{v}" }.join('&')
+      @options ||= {}
+      params.merge(@options).sort_by { |k, _v| k.to_s }.collect { |k, v| "#{k}=#{v}" }.join('&')
     end
 
     def normalized_signed_params
@@ -61,7 +64,12 @@ module OAuth
 
     def signature_key
       key = percent_encode(consumer_secret) + '&'
-      key += percent_encode(token_secret) if request_token?
+      if access_token?
+        key +=  percent_encode(token_secret)
+      elsif request_token?
+        key +=  percent_encode(access_token_secret)
+      end
+
       key
     end
 
@@ -82,6 +90,10 @@ module OAuth
 
     def request_token?
       !token.nil? && !token_secret.nil?
+    end
+
+    def access_token?
+      !access_token.nil? && !access_token_secret.nil?
     end
 
     def percent_encode(str)

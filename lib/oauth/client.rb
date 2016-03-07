@@ -40,10 +40,10 @@ module OAuth
     def post(url, opts = {})
       @request_url = url
       @request_method = :post
+      @options = opts
 
       uri = URI(@request_url)
 
-      
       uri.query = opts.collect { |k, v| "#{k}=#{v}" }.join('&') unless opts.nil?
 
       http = Net::HTTP.new(uri.host, uri.port)
@@ -78,8 +78,8 @@ module OAuth
       opts = {}
       res.split('&').map { |str| str.split('=') }.each { |k, v| opts[k] = v }
 
-      self.token = opts['oauth_token']
-      self.token_secret = opts['oauth_token_secret']
+      self.access_token = opts['oauth_token']
+      self.access_token_secret = opts['oauth_token_secret']
 
       opts
     end
