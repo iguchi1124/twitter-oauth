@@ -71,7 +71,7 @@ module OAuth
     end
 
     def fetch_access_token(access_token_url, method = :post)
-      return unless request_token?
+      return if access_token? || !request_token?
 
       res = send(method, access_token_url)
 
