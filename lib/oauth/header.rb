@@ -22,7 +22,6 @@ module OAuth
         oauth_consumer_key: consumer_key,
         oauth_signature_method: signature_method,
         oauth_timestamp: timestamp,
-        oauth_callback: callback,
         oauth_version: VERSION
       }
 
@@ -31,6 +30,8 @@ module OAuth
       elsif request_token?
         params[:oauth_token] = token
         params[:oauth_verifier] = callback == 'oob' ? pin : callback
+      else
+        params[:oauth_callback] = callback
       end
 
       params
@@ -65,9 +66,9 @@ module OAuth
     def signature_key
       key = percent_encode(consumer_secret) + '&'
       if access_token?
-        key +=  percent_encode(token_secret)
-      elsif request_token?
         key +=  percent_encode(access_token_secret)
+      elsif request_token?
+        key +=  percent_encode(token_secret)
       end
 
       key
