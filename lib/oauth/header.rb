@@ -43,7 +43,6 @@ module OAuth
     end
 
     def normalized_params
-      @options ||= {}
       params.merge(@options).sort_by { |k, _v| k.to_s }.collect { |k, v| "#{k}=#{v}" }.join('&')
     end
 

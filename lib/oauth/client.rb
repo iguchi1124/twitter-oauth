@@ -21,12 +21,14 @@ module OAuth
       self.callback         ||= opts['callback'] || 'oob'
     end
 
-    def get(url)
+    def get(url, opts = {})
       @request_url = url
       @request_method = :get
+      @options = opts
 
       uri = URI(request_url)
       uri.query = normalized_signed_params
+      uri.query += '&' + opts.collect { |k, v| "#{k}=#{v}" }.join('&') unless opts.nil?
 
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true if uri.port == 443
