@@ -14,4 +14,5 @@ print "次のURLで認証して下さい: https://api.twitter.com/oauth/authoriz
 print "PINコードを入力して下さい: "
 client.pin = gets
 client.fetch_access_token('https://api.twitter.com/oauth/access_token')
+binding.pry
 puts client.post('https://api.twitter.com/1.1/statuses/update.json', status: 'tweet test')
