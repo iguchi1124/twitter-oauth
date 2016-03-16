@@ -92,7 +92,7 @@ module OAuth
     def define_singleton_accessor(name)
       name = name.to_s
       define_singleton_method(:"#{name}") { eval "@#{name}" }
-      define_singleton_method(:"#{name}=") { |val| eval "@#{name} = #{val}" }
+      define_singleton_method(:"#{name}=") { |val| eval "@#{name} = val" }
     end
   end
 end
