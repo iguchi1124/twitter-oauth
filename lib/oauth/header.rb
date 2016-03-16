@@ -9,11 +9,11 @@ module OAuth
                   :callback,
                   :consumer_key,
                   :consumer_secret,
-                  :signature_method,
-                  :token,
-                  :token_secret
+                  :request_token,
+                  :request_token_secret,
+                  :signature_method
 
-    def params
+        def params
       params = {
         oauth_nonce: @nonce ||= nonce,
         oauth_consumer_key: consumer_key,
@@ -22,10 +22,10 @@ module OAuth
         oauth_version: VERSION
       }
 
-      if access_token?
+      if has_access_token?
         params[:oauth_token] = access_token
-      elsif request_token?
-        params[:oauth_token] = token
+      elsif has_request_token?
+        params[:oauth_token] = request_token
         params[:oauth_verifier] = callback == 'oob' ? pin : callback
       else
         params[:oauth_callback] = callback
@@ -74,10 +74,10 @@ module OAuth
 
     def signature_key
       key = percent_encode(consumer_secret) + '&'
-      if access_token?
+      if has_access_token?
         key +=  percent_encode(access_token_secret)
-      elsif request_token?
-        key +=  percent_encode(token_secret)
+      elsif has_request_token?
+        key +=  percent_encode(request_token_secret)
       end
 
       key
@@ -98,11 +98,11 @@ module OAuth
       ].join('&')
     end
 
-    def request_token?
-      !token.nil? && !token_secret.nil?
+    def has_request_token?
+      !request_token.nil? && !request_token_secret.nil?
     end
 
-    def access_token?
+    def has_access_token?
       !access_token.nil? && !access_token_secret.nil?
     end
 

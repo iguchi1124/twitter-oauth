@@ -58,15 +58,15 @@ module OAuth
     end
 
     def fetch_request_token(request_token_url, method = :post)
-      return if request_token?
+      return if has_request_token?
 
       res = send(method, request_token_url)
 
       opts = {}
       res.split('&').map { |str| str.split('=') }.each { |k, v| opts[k] = v }
 
-      self.token = opts['oauth_token']
-      self.token_secret = opts['oauth_token_secret']
+      self.request_token = opts['oauth_token']
+      self.request_token_secret = opts['oauth_token_secret']
 
       define_singleton_accessor(:pin) if callback == 'oob'
 
@@ -74,7 +74,7 @@ module OAuth
     end
 
     def fetch_access_token(access_token_url, method = :post)
-      return if access_token? || !request_token?
+      return if has_access_token? || !has_request_token?
 
       res = send(method, access_token_url)
 
