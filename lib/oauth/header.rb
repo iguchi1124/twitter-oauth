@@ -9,19 +9,16 @@ module OAuth
                   :callback,
                   :consumer_key,
                   :consumer_secret,
-                  :nonce,
-                  :pin,
                   :signature_method,
-                  :timestamp,
                   :token,
                   :token_secret
 
     def params
       params = {
-        oauth_nonce: nonce,
+        oauth_nonce: @nonce ||= nonce,
         oauth_consumer_key: consumer_key,
         oauth_signature_method: signature_method,
-        oauth_timestamp: timestamp,
+        oauth_timestamp: @timestamp ||= timestamp,
         oauth_version: VERSION
       }
 
@@ -35,6 +32,19 @@ module OAuth
       end
 
       params
+    end
+
+    def nonce
+      OpenSSL::Random.random_bytes(16).unpack('H*')[0]
+    end
+
+    def timestamp
+      Time.now.to_i.to_s
+    end
+
+    def reset_onetime_params!
+      @nonce = nil
+      @timestamp = nil
     end
 
     def signed_params

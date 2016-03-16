@@ -16,8 +16,6 @@ module OAuth
       self.consumer_secret ||= opts['consumer_secret']
 
       self.signature_method ||= 'HMAC-SHA1'
-      self.timestamp        ||= Time.now.to_i.to_s
-      self.nonce            ||= OpenSSL::Random.random_bytes(16).unpack('H*')[0]
       self.callback         ||= opts['callback'] || 'oob'
     end
 
@@ -25,6 +23,7 @@ module OAuth
       @request_url = url
       @request_method = :get
       @options = opts
+      reset_onetime_params!
 
       uri = URI(request_url)
       uri.query = normalized_signed_params
@@ -43,6 +42,7 @@ module OAuth
       @request_url = url
       @request_method = :post
       @options = opts
+      reset_onetime_params!
 
       uri = URI(@request_url)
 
@@ -68,6 +68,8 @@ module OAuth
       self.token = opts['oauth_token']
       self.token_secret = opts['oauth_token_secret']
 
+      define_singleton_accessor(:pin) if callback == 'oob'
+
       opts
     end
 
@@ -83,6 +85,14 @@ module OAuth
       self.access_token_secret = opts['oauth_token_secret']
 
       opts
+    end
+
+    private
+
+    def define_singleton_accessor(name)
+      name = name.to_s
+      define_singleton_method(:"#{name}") { eval "@#{name}" }
+      define_singleton_method(:"#{name}=") { |val| eval "@#{name} = #{val}" }
     end
   end
 end
