@@ -107,9 +107,9 @@ module OAuth
     end
 
     def percent_encode(str)
-      string = str.to_s
-      encoding = string.encoding
-      string.b.gsub(/([^ a-zA-Z0-9_.-]+)/) do |m|
+      str = str.to_s
+      encoding = str.encoding
+      str.b.gsub(/([^ a-zA-Z0-9_.-]+)/) do |m|
         '%' + m.unpack('H2' * m.bytesize).join('%').upcase
       end.tr(' ', '+').force_encoding(encoding)
     end
