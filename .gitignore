@@ -36,3 +36,4 @@ Gemfile.lock
 .rvmrc
 
 secrets.yml
+.rubocop.yml
