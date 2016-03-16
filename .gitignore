@@ -37,3 +37,4 @@ Gemfile.lock
 
 secrets.yml
 .rubocop.yml
+.idea/
