@@ -13,7 +13,7 @@ module OAuth
                   :request_token_secret,
                   :signature_method
 
-        def params
+    def params
       params = {
         oauth_nonce: @nonce ||= nonce,
         oauth_consumer_key: consumer_key,
