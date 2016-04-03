@@ -11,9 +11,10 @@ module OAuth
 
     def initialize(opts = {})
       yield self if block_given?
+      @callback         ||= opts['callback'] || 'oob'
       @consumer_key     ||= opts['consumer_key']
       @consumer_secret  ||= opts['consumer_secret']
-      @callback         ||= opts['callback'] || 'oob'
+      @nonce            ||= opts['nonce']
     end
 
     def set_request_params(verb, url, opts = {})
