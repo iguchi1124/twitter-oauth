@@ -20,4 +20,11 @@ describe OAuth::Header do
       expect(Base64.encode64(str).delete("\n")).to eq(base64_encode(str))
     end
   end
+
+  describe '#base_string_uri' do
+    before { @uri = URI('HTTP://Example.com:80/resource?id=123') }
+    it do
+      expect(base_string_uri).to eq 'http://example.com/resource'
+    end
+  end
 end

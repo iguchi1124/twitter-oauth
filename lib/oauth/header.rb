@@ -84,9 +84,9 @@ module OAuth
     end
 
     def base_string_uri
-      host = @uri.host
+      host = @uri.host.downcase
       host += ":#{@uri.port}" unless @uri.port == 80 || @uri.port == 443
-      @uri.scheme + '://' + host + @uri.path
+      @uri.scheme + '://' + host + @uri.path.downcase
     end
 
     def signature_base
