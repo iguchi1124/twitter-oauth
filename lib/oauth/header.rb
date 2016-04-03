@@ -84,26 +84,25 @@ module OAuth
     end
 
     def base_string_uri
-      uri = URI(@request_url)
-      host = uri.host
-      host += ":#{uri.port}" unless uri.port == 80 || uri.port == 443
-      uri.scheme + '://' + host + uri.path
+      host = @uri.host
+      host += ":#{@uri.port}" unless @uri.port == 80 || @uri.port == 443
+      @uri.scheme + '://' + host + @uri.path
     end
 
     def signature_base
       [
-        percent_encode(@request_method.upcase.to_s),
+        percent_encode(@method),
         percent_encode(base_string_uri),
         percent_encode(normalized_params)
       ].join('&')
     end
 
     def has_request_token?
-      !request_token.nil? && !request_token_secret.nil?
+      !(@request_token.nil? || @request_token_secret.nil?)
     end
 
     def has_access_token?
-      !access_token.nil? && !access_token_secret.nil?
+      !(@access_token.nil? || @access_token_secret.nil?)
     end
 
     def percent_encode(str)

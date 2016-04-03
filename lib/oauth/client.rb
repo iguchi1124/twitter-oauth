@@ -20,36 +20,36 @@ module OAuth
     end
 
     def set_request_params(verb, url, opts = {})
-      @request_method = verb
-      @request_url = url
+      @method = verb
+      @uri = URI(url)
       @options = opts
       reset_onetime_params!
     end
 
     def get(url, opts = {})
-      set_request_params('GET', url, opts.each { |k, v| opts[k] = URI.encode(v.to_s) })
+      opts.each { |k, v| opts[k] = URI.encode(v.to_s) }
+      set_request_params('GET', url, opts)
 
-      uri = URI(@request_url)
-      uri.query = normalized_signed_params
-      uri.query += '&' + @options.collect { |k, v| "#{k}=#{v}" }.join('&') unless @options.nil?
+      @uri.query = normalized_signed_params
+      @uri.query += '&' + @options.collect { |k, v| "#{k}=#{v}" }.join('&') unless @options.nil?
 
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true if uri.port == 443
+      http = Net::HTTP.new(@uri.host, @uri.port)
+      http.use_ssl = true if @uri.port == 443
 
-      req = Net::HTTP::Get.new(uri)
+      req = Net::HTTP::Get.new(@uri)
 
       res = http.request(req)
       res.body
     end
 
     def post(url, opts = {})
-      set_request_params('POST', url, opts.each { |k, v| opts[k] = URI.encode(v.to_s) })
+      opts.each { |k, v| opts[k] = URI.encode(v.to_s) }
+      set_request_params('POST', url, opts)
 
-      uri = URI(@request_url)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true if uri.port == 443
+      http = Net::HTTP.new(@uri.host, @uri.port)
+      http.use_ssl = true if @uri.port == 443
 
-      req = Net::HTTP::Post.new(uri)
+      req = Net::HTTP::Post.new(@uri)
       req['Authorization'] = authorization_header
       req.body = @options.collect { |k, v| "#{k}=#{v}" }.join('&') unless @options.nil?
 
