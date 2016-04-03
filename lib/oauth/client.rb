@@ -11,11 +11,8 @@ module OAuth
 
     def initialize(opts = {})
       yield self if block_given?
-
-      @consumer_key    ||= opts['consumer_key']
-      @consumer_secret ||= opts['consumer_secret']
-
-      @signature_method ||= 'HMAC-SHA1'
+      @consumer_key     ||= opts['consumer_key']
+      @consumer_secret  ||= opts['consumer_secret']
       @callback         ||= opts['callback'] || 'oob'
     end
 

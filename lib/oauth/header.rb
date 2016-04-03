@@ -10,14 +10,13 @@ module OAuth
                   :consumer_key,
                   :consumer_secret,
                   :request_token,
-                  :request_token_secret,
-                  :signature_method
+                  :request_token_secret
 
     def params
       params = {
         oauth_nonce: @nonce ||= nonce,
         oauth_consumer_key: consumer_key,
-        oauth_signature_method: signature_method,
+        oauth_signature_method: 'HMAC-SHA1',
         oauth_timestamp: @timestamp ||= timestamp,
         oauth_version: VERSION
       }
