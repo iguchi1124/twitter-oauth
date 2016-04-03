@@ -22,10 +22,10 @@ module OAuth
     def get(url, opts = {})
       @request_url = url
       @request_method = :get
-      @options = opts
+      @options = opts.each { |k, v| opts[k] = URI.encode v.to_s }
       reset_onetime_params!
 
-      uri = URI(request_url)
+      uri = URI(@request_url)
       uri.query = normalized_signed_params
       uri.query += '&' + opts.collect { |k, v| "#{k}=#{v}" }.join('&') unless opts.nil?
 
@@ -41,7 +41,7 @@ module OAuth
     def post(url, opts = {})
       @request_url = url
       @request_method = :post
-      @options = opts
+      @options = opts.each { |k, v| opts[k] = URI.encode v.to_s }
       reset_onetime_params!
 
       uri = URI(@request_url)
